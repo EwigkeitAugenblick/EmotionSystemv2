@@ -154,7 +154,7 @@ def vector_get(video_urls):
         params = {
             'bvid': BV2
         }
-        time.sleep(0.1)
+        time.sleep(1)
         response2 = requests.get(api, params=params, headers=headers)
         response2.encoding = 'utf-8-sig'
         videos2 = json.loads(response2.text)
