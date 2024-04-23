@@ -158,17 +158,17 @@ def vector_get(video_urls):
         response2 = requests.get(api, params=params, headers=headers)
         response2.encoding = 'utf-8-sig'
         videos2 = json.loads(response2.text)
-        video2 = videos2['data']
+        video3 = videos2['data']
 
-        view = video2['stat']['view']
-        danmaku = video2['stat']['danmaku']
-        reply = video2['stat']['reply']
-        favorite = video2['stat']['favorite']
-        coin = video2['stat']['coin']
-        share = video2['stat']['share']
-        like = video2['stat']['like']
+        view = video3['stat']['view']
+        danmaku = video3['stat']['danmaku']
+        reply = video3['stat']['reply']
+        favorite = video3['stat']['favorite']
+        coin = video3['stat']['coin']
+        share = video3['stat']['share']
+        like = video3['stat']['like']
 
-        mid = video2['owner']['mid']
+        mid = video3['owner']['mid']
         users = requests.get(f'https://api.bilibili.com/x/relation/stat?vmid={mid}', headers=headers)
         users.encoding = 'utf-8-sig'
         users = json.loads(users.text)['data']
