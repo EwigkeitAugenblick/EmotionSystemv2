@@ -62,33 +62,36 @@ def reason_confer(vector_list):
         feature_list.append('播放量')
     if k in hot:
         feature_list.append('热度')
-    if '上下文相关' and '标题' in feature_list:
-        prevideo_list = [0, 1, 2]
-    if '上下文相关' and '标签' in feature_list:
-        prevideo_list = [3, 4, 5]
-    if '上下文相关' and '简介' in feature_list:
-        prevideo_list = [6, 7, 8]
-    if '上下文相关' and '封面' in feature_list:
-        prevideo_list = [9, 10, 11]
-    if '大数据相关' and '标题' in feature_list:
-        prevideo_list = [12, 13, 14]
-    if '大数据相关' and '标签' in feature_list:
-        prevideo_list = [15, 16, 17]
-    if '大数据相关' and '简介' in feature_list:
-        prevideo_list = [18, 19, 20]
-    if '大数据相关' and '封面' in feature_list:
-        prevideo_list = [21, 22, 23]
-    if '内容相关' and '标题' in feature_list:
-        prevideo_list = [24, 25, 26]
-    if '内容相关' and '标签' in feature_list:
-        prevideo_list = [27, 28, 29]
-    if '内容相关' and '简介' in feature_list:
-        prevideo_list = [30, 31, 32]
-    if '内容相关' and '封面' in feature_list:
-        prevideo_list = [33, 34, 35]
+    if '上下文相关' in feature_list:
+        if '标题' in feature_list:
+            prevideo_list = [0, 1, 2]
+        elif '标签' in feature_list:
+            prevideo_list = [3, 4, 5]
+        elif '简介' in feature_list:
+            prevideo_list = [6, 7, 8]
+        elif '封面' in feature_list:
+            prevideo_list = [9, 10, 11]
+    if '大数据相关' in feature_list:
+        if '标题' in feature_list:
+            prevideo_list = [12, 13, 14]
+        elif '标签' in feature_list:
+            prevideo_list = [15, 16, 17]
+        elif '简介' in feature_list:
+            prevideo_list = [18, 19, 20]
+        elif '封面' in feature_list:
+            prevideo_list = [21, 22, 23]
+    if '内容相关' in feature_list:
+        if '标题' in feature_list:
+            prevideo_list = [24, 25, 26]
+        elif '标签' in feature_list:
+            prevideo_list = [27, 28, 29]
+        elif '简介' in feature_list:
+            prevideo_list = [30, 31, 32]
+        elif '封面' in feature_list:
+            prevideo_list = [33, 34, 35]
+
 
     return feature_list, y_pred, prevideo_list
-
 
 headers = {
     'authority': 'api.bilibili.com',
