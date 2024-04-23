@@ -249,9 +249,10 @@ def keyword_bv(keyword,BV):
     keyword_bvid = []
     for k in range(1, 2):   #for k in range(1, 4):
         b_url = f"https://search.bilibili.com/video?keyword={keyword}&duration=0&page={k}"
-        driver = webdriver.Chrome()
-        driver.get(b_url)
-        driver.implicitly_wait(10)
+        # 1 谷歌浏览器设置为无头模式
+        opts = webdriver.ChromeOptions()    # 声明一个谷歌配置对象
+        opts.set_headless() # 设置成无头
+        driver = webdriver.Chrome(chrome_options=opts)  # 选项注入
         for j in range(1, 30):
             try:
                 key_video_url = driver.find_element(By.XPATH,
