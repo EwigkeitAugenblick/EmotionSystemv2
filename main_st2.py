@@ -409,9 +409,10 @@ def main():
                 with st.expander('可选择视频列表', True):
                     st.write(list_new)
             if number:
-                project_path = os.getcwd()
-                file = '相关视频/第' + number + '条链接相关视频.csv'
-                related_video = pd.read_csv(file, encoding='utf-8')
+                default_folder='相关视频'
+                filename = '第' + number + '条链接相关视频.csv'
+                file_path = os.path.join(default_folder, file_name)
+                related_video = pd.read_csv(file_path, encoding='utf-8')
                 col_ex1, col_ex2, col_ex3 = st.columns([1, 1, 1])
                 # with open('progress_bar.css', 'r', ) as f:
                 # st.markdown('<style>{}</style>'.format(f.read()), unsafe_allow_html=True)
