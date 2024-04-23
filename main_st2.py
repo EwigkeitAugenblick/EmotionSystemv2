@@ -111,12 +111,6 @@ headers = {
 }
 
 
-def load_lottie_json(path):
-    with open(path, "r") as f:
-        lottie_json = f.read()
-    return lottie_json
-
-
 def initial():
     global keyword
     keyword = None
@@ -214,127 +208,6 @@ def upload_file_to_0x0(file_path):
         return None
 
 
-def normalize_location_names(locations):
-    provinces = ['河南', '江苏', '山西', '福建', '四川', '海南', '吉林', '安徽', '浙江', '陕西', '黑龙江', '广东',
-                 '河北', '山东', '辽宁', '云南', '湖北', '江西', '湖南', '甘肃', '贵州', '青海', '台湾']
-    municipalities = ['天津', '重庆', '北京', '上海']
-    special_administrative_regions = ['香港', '澳门']
-    autonomous_regions = {'新疆': '新疆维吾尔自治区', '内蒙古': '内蒙古自治区', '西藏': '西藏自治区',
-                          '宁夏': '宁夏回族自治区', '广西': '广西壮族自治区'}
-    others = ['其他']
-    all_locations = provinces + municipalities + list(
-        autonomous_regions.keys()) + special_administrative_regions + others
-    new_locations = {}
-    for location in locations.keys():
-        if location in all_locations:
-            if location in provinces:
-                new_locations[location + "省"] = locations[location]
-            elif location in municipalities:
-                new_locations[location + "市"] = locations[location]
-            elif location in special_administrative_regions:
-                new_locations[location + "特别行政区"] = locations[location]
-            elif location in autonomous_regions:
-                new_locations[autonomous_regions[location]] = locations[location]
-            else:
-                new_locations[location] = locations[location]
-    return new_locations
-
-
-def report_show():
-    st.markdown(r'''<style>
-                    .box {
-                        position: relative;
-                    }
-                        .box img {
-                        width: 300px;
-                    }
-
-                    .box .title {
-                        position: absolute;
-                        left: 15px;
-                        bottom: 20px;
-                        z-index: 2;
-                        width: 260px;
-                        color: #fff;
-                        font-size: 20px;
-                        font-weight: 700;
-                    }
-                    .box .mask {
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-
-                        opacity: 0;
-                        width: 300px;
-                        height: 410px;
-                        background-image: linear-gradient(
-                            transparent,
-                            rgba(0,0,0,.6)
-                        );
-                        transition: all .5s;
-                    }
-                    .box:hover .mask {
-                        opacity: 1;
-                    } 
-                </style>''', unsafe_allow_html=True)
-    reportpath1 = 'report.jpg'  # -----------------更改点--------------
-    # reporturl=st.session_state.url_pdf
-    if "疫情" in st.session_state.file_in.name:
-        # reporturl=r"https://drive.google.com/file/d/1i8suHggGPvH-QECbR5f9AtrDh9jLULlN/view?usp=sharing"# -----------------更改点--------------
-        reporturl = r'https://smallpdf.com/cn/file#s=00a9e41b-9dda-42d5-ad0c-b0bb4c5d3d10'
-    if "日本" in st.session_state.file_in.name:
-        # reporturl=r"https://drive.google.com/file/d/1OKFRVaK5IK8Wr9yb368YojmzOh1URxOT/view?usp=sharing"
-        reporturl = r'https://smallpdf.com/cn/file#s=53df9b72-ecc9-4cc5-8567-a34ec8a5a2ec'
-
-    if "三胎" in st.session_state.file_in.name:
-        # reporturl=r"https://drive.google.com/file/d/1BVOOybmUD7Dd6hyKJPRTOC2NALh80Qi5/view?usp=sharing"
-        reporturl = r'https://smallpdf.com/cn/file#s=b0133606-d306-465f-97fc-e9e6c4907006'
-    with open(reportpath1, "rb") as f:
-        data = f.read()
-        encoded = base64.b64encode(data)
-        data = "data:image/png;base64," + encoded.decode("utf-8")
-    st.markdown(f'''
-    <body>
-        <div class="box">
-            <a  href={reporturl}>
-            <img src={data} alt="">
-            <div class="title">分析报告</div>
-            <!-- 渐变背景 -->
-            <div class="mask"></div>
-            </a>
-        </div>
-    </body>
-    </html>''', unsafe_allow_html=True)
-
-
-def card_show():
-    reportpath = 'report.jpg'
-    bgcpath = 'bgc.jpg'
-    with open(reportpath, "rb") as f:
-        data = f.read()
-        encoded = base64.b64encode(data)
-        data = "data:image/png;base64," + encoded.decode("utf-8")
-        # st.markdown(r'''<style>
-        #         .css-1mb7ed4 {
-        #         background-color: rgba(211, 211, 211, 0.1);
-        #         }
-
-        #         </style>''',unsafe_allow_html=True)
-
-    res = st_card(
-        title="分析报告",
-        text="analysis",
-        image=data,
-        styles={
-            "card": {
-                "width": "250px",
-                "height": "320px",
-                "border-radius": "60px",
-                "box-shadow": "0 0 10px rgba(0,0,0,0.5)",
-            },
-        },
-        url="https://github.com/gamcoh/st-card",
-        on_click=lambda: st.write(''))
 
 
 def get_middle_part(file_name):
@@ -529,7 +402,8 @@ def main():
                 with st.expander('可选择视频列表', True):
                     st.write(list_new)
             if number:
-                file = r'D:\pythonProject\相关视频\第' + number + '条链接相关视频.csv'
+                project_path = os.getcwd()
+                file = project_path+'\相关视频\第' + number + '条链接相关视频.csv'
                 related_video = pd.read_csv(file, encoding='utf-8')
                 col_ex1, col_ex2, col_ex3 = st.columns([1, 1, 1])
                 # with open('progress_bar.css', 'r', ) as f:
@@ -621,99 +495,44 @@ def main():
                     st.text('正在排序内容相关视频...')
                     video_rec = all_sort.video_select(keyword_data, title, tag, intro, pic)
                     video = pd.concat([video_publisher, video_keyword, video_rec])
-                    video.to_csv(BV+'相关视频信息.csv')
+                    if video.shape[0]<36:
+                        st.text('由于网络原因，搜索失败，请尝试刷新系统')
+                        video.to_csv(BV + '相关视频信息.csv')
+                    else:
+                        video.to_csv(BV + '相关视频信息.csv')
+                        video_data = video.to_csv(index=False)
+
+                        progress_text = "正在搜索本视频的相关视频..."
+                        my_bar = st.progress(0, text=progress_text)
+                        for percent_complete in range(100):
+                            time.sleep(0.01)
+                            my_bar.progress(percent_complete + 1, text=progress_text)
+                        time.sleep(1)
+                        my_bar.empty()
+                        st.success('搜索完成！')
+                        st.success('本视频相关视频已保存为csv文件')
+                        col1, col2 = st.columns([2, 1])
+                        with col1:
+                            with st.expander("预测视频信息", True):
+                                st.write(
+                                    f'<a href="{url}"><p style="font-size:28px;font-weight:bold;">{title}</p ></a >',
+                                    unsafe_allow_html=True)
+                                col_ex1, col_ex2 = st.columns([1, 1])
+                                with col_ex1:
+                                    st.image('预测视频封面图片.png', caption='视频封面', width=400)
+                                with col_ex2:
+                                    st.write('<p style="font-size:18px;font-weight:bold;">标签：</p >',
+                                             unsafe_allow_html=True)
+                                    st.write(tag)
+                                    st.write('<p style="font-size:18px;font-weight:bold;">简介：</p >',
+                                             unsafe_allow_html=True)
+                                    st.write(intro)
+                            with st.expander("相关视频信息", True):
+                                data1 = pd.read_csv(BV + '相关视频信息.csv', encoding='utf-8', engine="python")
+                                st.write(data1)
+                        st.download_button("下载数据", video_data, file_name=BV + '相关视频信息.csv', mime='text/csv')
 
 
-                    progress_text = "正在搜索本视频的相关视频..."
-                    my_bar = st.progress(0, text=progress_text)
-                    for percent_complete in range(100):
-                        time.sleep(0.01)
-                        my_bar.progress(percent_complete + 1, text=progress_text)
-                    time.sleep(1)
-                    my_bar.empty()
-                    st.success('搜索完成！')
-                    st.success('本视频相关视频已保存为csv文件')
-                    col1, col2 = st.columns([2, 1])
-                    with col1:
-                        with st.expander("预测视频信息", True):
-                            st.write(f'<a href="{url}"><p style="font-size:28px;font-weight:bold;">{title}</p ></a >',
-                                     unsafe_allow_html=True)
-                            col_ex1, col_ex2 = st.columns([1, 1])
-                            with col_ex1:
-                                st.image('预测视频封面图片.png', caption='视频封面', width=400)
-                            with col_ex2:
-                                st.write('<p style="font-size:18px;font-weight:bold;">标签：</p >',
-                                         unsafe_allow_html=True)
-                                st.write(tag)
-                                st.write('<p style="font-size:18px;font-weight:bold;">简介：</p >',
-                                         unsafe_allow_html=True)
-                                st.write(intro)
-                        with st.expander("相关视频信息", True):
-                            data1 = pd.read_csv(BV+'相关视频信息.csv', encoding='utf-8', engine="python")
-                            st.write(data1)
-
-            # bv_num = re.findall(r'BV\w+', url)
-            # BV = ''.join(bv_num)
-            # if BV:
-            # time.sleep(0.1)
-            # video_api = 'https://api.bilibili.com/x/web-interface/view'
-            # tag_api = 'https://api.bilibili.com/x/tag/archive/tags'
-            # params = {
-            # 'bvid': BV
-            # }
-            # response = requests.get(video_api, params=params, headers=headers)
-            # response.encoding = 'utf-8-sig'
-            # videos = json.loads(response.text)
-            # video = videos['data']
-            # pic = video['pic']
-            # picture = requests.get(pic, stream=True)
-            # with open('封面图片.png', "wb") as png:
-            # for chunk in picture.iter_content(chunk_size=1024):
-            # if chunk:
-            # png.write(chunk)
-
-            # title = video['title']
-            # try:
-            # intro1 = video['desc_v2'][0]['raw_text']
-            # intro = intro1.replace('\n', ' ')
-            # except:
-            # intro = '-'
-
-            # tag = ''
-            # response2 = requests.get(tag_api, params=params, headers=headers)
-            # response2.encoding = 'utf-8-sig'
-            # tags = json.loads(response2.text)['data']
-            # for k in tags:
-            # tag = tag + k['tag_name'] + ' '
-
-            # if keyword == '0':
-            # keyword = title
-
-            # rec_bvid = []
-            # match = re.findall(r'BV\w+', url)
-            # BV = ''.join(match)
-            # url_related = 'https://api.bilibili.com/x/web-interface/archive/related'
-            # params = {
-            # 'bvid': BV
-            # }
-            # response = requests.get(url_related, params=params, headers=headers)
-            # response.encoding = 'utf-8-sig'
-            # rec_video_urls = json.loads(response.text)['data']
-            # for rec_video_url in rec_video_urls:
-            # rec_bvid.append(rec_video_url['bvid'])
-
-            # keyword_bvid = all_sort.keyword_bv(keyword, BV)
-            # publisher_bvid = all_sort.publisher_bv(BV, params)
-
-            # publisher_data = all_sort.data_crawler(publisher_bvid)
-            # rec_data = all_sort.data_crawler(rec_bvid)
-            # keyword_data = all_sort.data_crawler(keyword_bvid)
-
-            # video_publisher = all_sort.video_select(publisher_data, title, tag, intro)
-            # video_keyword = all_sort.video_select(rec_data, title, tag, intro)
-            # video_rec = all_sort.video_select(keyword_data, title, tag, intro)
-            # video = pd.concat([video_publisher, video_keyword, video_rec])
-            # video.to_csv('相关视频信息.csv')
 
         if model == '演示模式':
             list = pd.read_csv('示例视频列表.csv', encoding='utf-8')
@@ -754,7 +573,8 @@ def main():
             if url:
                 st.write(f'<p style="font-size:25px;font-weight:bold;">此视频相关视频列表:</p >',
                          unsafe_allow_html=True)
-                file = r'D:\pythonProject\相关视频\第' + number + '条链接相关视频.csv'
+                project_path = os.getcwd()
+                file = project_path+'\相关视频\第' + number + '条链接相关视频.csv'
                 related_video = pd.read_csv(file, encoding='utf-8')
                 video = related_video[['标题', '标签', '简介']]
                 with st.expander("同作者路径搜索视频:", True):
