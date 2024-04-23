@@ -8,7 +8,6 @@ import time
 import base64
 import numpy as np
 import pandas as pd
-from streamlit_card import card as st_card
 from datetime import datetime, timedelta
 import requests
 import re
@@ -216,127 +215,7 @@ def upload_file_to_0x0(file_path):
         return None
 
 
-def normalize_location_names(locations):
-    provinces = ['河南', '江苏', '山西', '福建', '四川', '海南', '吉林', '安徽', '浙江', '陕西', '黑龙江', '广东',
-                 '河北', '山东', '辽宁', '云南', '湖北', '江西', '湖南', '甘肃', '贵州', '青海', '台湾']
-    municipalities = ['天津', '重庆', '北京', '上海']
-    special_administrative_regions = ['香港', '澳门']
-    autonomous_regions = {'新疆': '新疆维吾尔自治区', '内蒙古': '内蒙古自治区', '西藏': '西藏自治区',
-                          '宁夏': '宁夏回族自治区', '广西': '广西壮族自治区'}
-    others = ['其他']
-    all_locations = provinces + municipalities + list(
-        autonomous_regions.keys()) + special_administrative_regions + others
-    new_locations = {}
-    for location in locations.keys():
-        if location in all_locations:
-            if location in provinces:
-                new_locations[location + "省"] = locations[location]
-            elif location in municipalities:
-                new_locations[location + "市"] = locations[location]
-            elif location in special_administrative_regions:
-                new_locations[location + "特别行政区"] = locations[location]
-            elif location in autonomous_regions:
-                new_locations[autonomous_regions[location]] = locations[location]
-            else:
-                new_locations[location] = locations[location]
-    return new_locations
 
-
-def report_show():
-    st.markdown(r'''<style>
-                    .box {
-                        position: relative;
-                    }
-                        .box img {
-                        width: 300px;
-                    }
-
-                    .box .title {
-                        position: absolute;
-                        left: 15px;
-                        bottom: 20px;
-                        z-index: 2;
-                        width: 260px;
-                        color: #fff;
-                        font-size: 20px;
-                        font-weight: 700;
-                    }
-                    .box .mask {
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-
-                        opacity: 0;
-                        width: 300px;
-                        height: 410px;
-                        background-image: linear-gradient(
-                            transparent,
-                            rgba(0,0,0,.6)
-                        );
-                        transition: all .5s;
-                    }
-                    .box:hover .mask {
-                        opacity: 1;
-                    } 
-                </style>''', unsafe_allow_html=True)
-    reportpath1 = 'report.jpg'  # -----------------更改点--------------
-    # reporturl=st.session_state.url_pdf
-    if "疫情" in st.session_state.file_in.name:
-        # reporturl=r"https://drive.google.com/file/d/1i8suHggGPvH-QECbR5f9AtrDh9jLULlN/view?usp=sharing"# -----------------更改点--------------
-        reporturl = r'https://smallpdf.com/cn/file#s=00a9e41b-9dda-42d5-ad0c-b0bb4c5d3d10'
-    if "日本" in st.session_state.file_in.name:
-        # reporturl=r"https://drive.google.com/file/d/1OKFRVaK5IK8Wr9yb368YojmzOh1URxOT/view?usp=sharing"
-        reporturl = r'https://smallpdf.com/cn/file#s=53df9b72-ecc9-4cc5-8567-a34ec8a5a2ec'
-
-    if "三胎" in st.session_state.file_in.name:
-        # reporturl=r"https://drive.google.com/file/d/1BVOOybmUD7Dd6hyKJPRTOC2NALh80Qi5/view?usp=sharing"
-        reporturl = r'https://smallpdf.com/cn/file#s=b0133606-d306-465f-97fc-e9e6c4907006'
-    with open(reportpath1, "rb") as f:
-        data = f.read()
-        encoded = base64.b64encode(data)
-        data = "data:image/png;base64," + encoded.decode("utf-8")
-    st.markdown(f'''
-    <body>
-        <div class="box">
-            <a  href={reporturl}>
-            <img src={data} alt="">
-            <div class="title">分析报告</div>
-            <!-- 渐变背景 -->
-            <div class="mask"></div>
-            </a>
-        </div>
-    </body>
-    </html>''', unsafe_allow_html=True)
-
-
-def card_show():
-    reportpath = 'report.jpg'
-    bgcpath = 'bgc.jpg'
-    with open(reportpath, "rb") as f:
-        data = f.read()
-        encoded = base64.b64encode(data)
-        data = "data:image/png;base64," + encoded.decode("utf-8")
-        # st.markdown(r'''<style>
-        #         .css-1mb7ed4 {
-        #         background-color: rgba(211, 211, 211, 0.1);
-        #         }
-
-        #         </style>''',unsafe_allow_html=True)
-
-    res = st_card(
-        title="分析报告",
-        text="analysis",
-        image=data,
-        styles={
-            "card": {
-                "width": "250px",
-                "height": "320px",
-                "border-radius": "60px",
-                "box-shadow": "0 0 10px rgba(0,0,0,0.5)",
-            },
-        },
-        url="https://github.com/gamcoh/st-card",
-        on_click=lambda: st.write(''))
 
 
 def get_middle_part(file_name):
