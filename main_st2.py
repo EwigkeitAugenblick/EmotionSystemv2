@@ -8,13 +8,14 @@ import time
 import base64
 import numpy as np
 import pandas as pd
+from streamlit_card import card as st_card
 from datetime import datetime, timedelta
 import requests
 import re
 import json
+import jieba
 import xgboost as xgb
 import all_sort
-import os
 
 
 
@@ -61,34 +62,30 @@ def reason_confer(vector_list):
         feature_list.append('播放量')
     if k in hot:
         feature_list.append('热度')
-    if '上下文相关' in feature_list:
-        if '标题' in feature_list:
-            prevideo_list = [0, 1, 2]
-        elif '标签' in feature_list:
-            prevideo_list = [3, 4, 5]
-        elif '简介' in feature_list:
-            prevideo_list = [6, 7, 8]
-        elif '封面' in feature_list:
-            prevideo_list = [9, 10, 11]
-    if '大数据相关' in feature_list:
-        if '标题' in feature_list:
-            prevideo_list = [12, 13, 14]
-        elif '标签' in feature_list:
-            prevideo_list = [15, 16, 17]
-        elif '简介' in feature_list:
-            prevideo_list = [18, 19, 20]
-        elif '封面' in feature_list:
-            prevideo_list = [21, 22, 23]
-    if '内容相关' in feature_list:
-        if '标题' in feature_list:
-            prevideo_list = [24, 25, 26]
-        elif '标签' in feature_list:
-            prevideo_list = [27, 28, 29]
-        elif '简介' in feature_list:
-            prevideo_list = [30, 31, 32]
-        elif '封面' in feature_list:
-            prevideo_list = [33, 34, 35]
-
+    if '上下文相关' and '标题' in feature_list:
+        prevideo_list = [0, 1, 2]
+    if '上下文相关' and '标签' in feature_list:
+        prevideo_list = [3, 4, 5]
+    if '上下文相关' and '简介' in feature_list:
+        prevideo_list = [6, 7, 8]
+    if '上下文相关' and '封面' in feature_list:
+        prevideo_list = [9, 10, 11]
+    if '大数据相关' and '标题' in feature_list:
+        prevideo_list = [12, 13, 14]
+    if '大数据相关' and '标签' in feature_list:
+        prevideo_list = [15, 16, 17]
+    if '大数据相关' and '简介' in feature_list:
+        prevideo_list = [18, 19, 20]
+    if '大数据相关' and '封面' in feature_list:
+        prevideo_list = [21, 22, 23]
+    if '内容相关' and '标题' in feature_list:
+        prevideo_list = [24, 25, 26]
+    if '内容相关' and '标签' in feature_list:
+        prevideo_list = [27, 28, 29]
+    if '内容相关' and '简介' in feature_list:
+        prevideo_list = [30, 31, 32]
+    if '内容相关' and '封面' in feature_list:
+        prevideo_list = [33, 34, 35]
 
     return feature_list, y_pred, prevideo_list
 
@@ -214,7 +211,127 @@ def upload_file_to_0x0(file_path):
         return None
 
 
+def normalize_location_names(locations):
+    provinces = ['河南', '江苏', '山西', '福建', '四川', '海南', '吉林', '安徽', '浙江', '陕西', '黑龙江', '广东',
+                 '河北', '山东', '辽宁', '云南', '湖北', '江西', '湖南', '甘肃', '贵州', '青海', '台湾']
+    municipalities = ['天津', '重庆', '北京', '上海']
+    special_administrative_regions = ['香港', '澳门']
+    autonomous_regions = {'新疆': '新疆维吾尔自治区', '内蒙古': '内蒙古自治区', '西藏': '西藏自治区',
+                          '宁夏': '宁夏回族自治区', '广西': '广西壮族自治区'}
+    others = ['其他']
+    all_locations = provinces + municipalities + list(
+        autonomous_regions.keys()) + special_administrative_regions + others
+    new_locations = {}
+    for location in locations.keys():
+        if location in all_locations:
+            if location in provinces:
+                new_locations[location + "省"] = locations[location]
+            elif location in municipalities:
+                new_locations[location + "市"] = locations[location]
+            elif location in special_administrative_regions:
+                new_locations[location + "特别行政区"] = locations[location]
+            elif location in autonomous_regions:
+                new_locations[autonomous_regions[location]] = locations[location]
+            else:
+                new_locations[location] = locations[location]
+    return new_locations
 
+
+def report_show():
+    st.markdown(r'''<style>
+                    .box {
+                        position: relative;
+                    }
+                        .box img {
+                        width: 300px;
+                    }
+
+                    .box .title {
+                        position: absolute;
+                        left: 15px;
+                        bottom: 20px;
+                        z-index: 2;
+                        width: 260px;
+                        color: #fff;
+                        font-size: 20px;
+                        font-weight: 700;
+                    }
+                    .box .mask {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+
+                        opacity: 0;
+                        width: 300px;
+                        height: 410px;
+                        background-image: linear-gradient(
+                            transparent,
+                            rgba(0,0,0,.6)
+                        );
+                        transition: all .5s;
+                    }
+                    .box:hover .mask {
+                        opacity: 1;
+                    } 
+                </style>''', unsafe_allow_html=True)
+    reportpath1 = 'report.jpg'  # -----------------更改点--------------
+    # reporturl=st.session_state.url_pdf
+    if "疫情" in st.session_state.file_in.name:
+        # reporturl=r"https://drive.google.com/file/d/1i8suHggGPvH-QECbR5f9AtrDh9jLULlN/view?usp=sharing"# -----------------更改点--------------
+        reporturl = r'https://smallpdf.com/cn/file#s=00a9e41b-9dda-42d5-ad0c-b0bb4c5d3d10'
+    if "日本" in st.session_state.file_in.name:
+        # reporturl=r"https://drive.google.com/file/d/1OKFRVaK5IK8Wr9yb368YojmzOh1URxOT/view?usp=sharing"
+        reporturl = r'https://smallpdf.com/cn/file#s=53df9b72-ecc9-4cc5-8567-a34ec8a5a2ec'
+
+    if "三胎" in st.session_state.file_in.name:
+        # reporturl=r"https://drive.google.com/file/d/1BVOOybmUD7Dd6hyKJPRTOC2NALh80Qi5/view?usp=sharing"
+        reporturl = r'https://smallpdf.com/cn/file#s=b0133606-d306-465f-97fc-e9e6c4907006'
+    with open(reportpath1, "rb") as f:
+        data = f.read()
+        encoded = base64.b64encode(data)
+        data = "data:image/png;base64," + encoded.decode("utf-8")
+    st.markdown(f'''
+    <body>
+        <div class="box">
+            <a  href={reporturl}>
+            <img src={data} alt="">
+            <div class="title">分析报告</div>
+            <!-- 渐变背景 -->
+            <div class="mask"></div>
+            </a>
+        </div>
+    </body>
+    </html>''', unsafe_allow_html=True)
+
+
+def card_show():
+    reportpath = 'report.jpg'
+    bgcpath = 'bgc.jpg'
+    with open(reportpath, "rb") as f:
+        data = f.read()
+        encoded = base64.b64encode(data)
+        data = "data:image/png;base64," + encoded.decode("utf-8")
+        # st.markdown(r'''<style>
+        #         .css-1mb7ed4 {
+        #         background-color: rgba(211, 211, 211, 0.1);
+        #         }
+
+        #         </style>''',unsafe_allow_html=True)
+
+    res = st_card(
+        title="分析报告",
+        text="analysis",
+        image=data,
+        styles={
+            "card": {
+                "width": "250px",
+                "height": "320px",
+                "border-radius": "60px",
+                "box-shadow": "0 0 10px rgba(0,0,0,0.5)",
+            },
+        },
+        url="https://github.com/gamcoh/st-card",
+        on_click=lambda: st.write(''))
 
 
 def get_middle_part(file_name):
@@ -409,10 +526,8 @@ def main():
                 with st.expander('可选择视频列表', True):
                     st.write(list_new)
             if number:
-                default_folder='相关视频'
-                filename = '第' + number + '条链接相关视频.csv'
-                file_path = os.path.join(default_folder, file_name)
-                related_video = pd.read_csv(file_path, encoding='utf-8')
+                file = r'D:\pythonProject\相关视频\第' + number + '条链接相关视频.csv'
+                related_video = pd.read_csv(file, encoding='utf-8')
                 col_ex1, col_ex2, col_ex3 = st.columns([1, 1, 1])
                 # with open('progress_bar.css', 'r', ) as f:
                 # st.markdown('<style>{}</style>'.format(f.read()), unsafe_allow_html=True)
@@ -504,7 +619,6 @@ def main():
                     video_rec = all_sort.video_select(keyword_data, title, tag, intro, pic)
                     video = pd.concat([video_publisher, video_keyword, video_rec])
                     video.to_csv(BV+'相关视频信息.csv')
-                    video_data=video.to_csv(index=False)
 
 
                     progress_text = "正在搜索本视频的相关视频..."
@@ -534,7 +648,6 @@ def main():
                         with st.expander("相关视频信息", True):
                             data1 = pd.read_csv(BV+'相关视频信息.csv', encoding='utf-8', engine="python")
                             st.write(data1)
-                    st.download_button("下载数据", video_data, file_name=BV+'相关视频信息.csv', mime='text/csv')
 
             # bv_num = re.findall(r'BV\w+', url)
             # BV = ''.join(bv_num)
@@ -638,8 +751,7 @@ def main():
             if url:
                 st.write(f'<p style="font-size:25px;font-weight:bold;">此视频相关视频列表:</p >',
                          unsafe_allow_html=True)
-                project_path = os.getcwd()
-                file = project_path+'\相关视频\第' + number + '条链接相关视频.csv'
+                file = r'D:\pythonProject\相关视频\第' + number + '条链接相关视频.csv'
                 related_video = pd.read_csv(file, encoding='utf-8')
                 video = related_video[['标题', '标签', '简介']]
                 with st.expander("同作者路径搜索视频:", True):
@@ -708,4 +820,6 @@ if __name__ == '__main__':  # 不用命令端输入“streamlit run app.py”而
     else:
         sys.argv = ["streamlit", "run", sys.argv[0]]
         sys.exit(stcli.main())
+
+
 
