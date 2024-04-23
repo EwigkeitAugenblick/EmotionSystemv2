@@ -150,11 +150,11 @@ def vector_get(video_urls):
     for url_related in video_urls:
         bv_num = re.findall(r'BV\w+', url_related)
         BV2 = ''.join(bv_num)
-        time.sleep(0.1)
         api = 'https://api.bilibili.com/x/web-interface/view'
         params = {
             'bvid': BV2
         }
+        time.sleep(0.1)
         response2 = requests.get(api, params=params, headers=headers)
         response2.encoding = 'utf-8-sig'
         videos2 = json.loads(response2.text)
