@@ -12,7 +12,6 @@ from datetime import datetime, timedelta
 import requests
 import re
 import json
-import jieba
 import xgboost as xgb
 import all_sort
 import os
