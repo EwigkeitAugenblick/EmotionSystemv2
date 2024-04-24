@@ -18,6 +18,7 @@ from PIL import Image
 import imagehash
 import streamlit as st
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver import Chrome
 
 
 
