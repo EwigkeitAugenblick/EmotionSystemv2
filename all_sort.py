@@ -275,56 +275,44 @@ def publisher_bv(BV,params):
     videos = json.loads(response.text)
     video = videos['data']
     mid = video['owner']['mid']
-    with st.echo():
-        from selenium import webdriver
-        from selenium.webdriver.chrome.options import Options
-        from selenium.webdriver.chrome.service import Service
-        from webdriver_manager.chrome import ChromeDriverManager
-        from webdriver_manager.core.os_manager import ChromeType
-        
-        @st.cache_resource
-        def get_driver():
-            return webdriver.Chrome(
-            service=Service(
-                ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
-            ),
-            options=options,
-        )
-        options = Options()
-        options.add_argument("--disable-gpu")
-        options.add_argument("--headless")
-        
-        driver = get_driver()
-        driver.get('https://space.bilibili.com/' + str(mid) + '/video')
-        time.sleep(30)
-        number= int(driver.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/div/div[2]/div[2]/a[1]/span").text)
-        page = number // 30
-        if page==0:
-            for p in range(0,number):
-                url_publisher_video = driver.find_element(By.XPATH,
+    
+    opt = Options()
+    opt.add_argument('--headless')  # 设置为无头
+    opt.add_argument('--disable-gpu') 
+
+    driver = Chrome(options=opt)
+    
+    driver.get('https://space.bilibili.com/' + str(mid) + '/video')
+    time.sleep(30)
+    number= int(driver.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/div/div[2]/div[2]/a[1]/span").text)
+    page = number // 30
+    if page==0:
+        for p in range(0,number):
+            url_publisher_video = driver.find_element(By.XPATH,
                                                       "/html/body/div[2]/div[4]/div/div/div[2]/div[4]/div/div/ul[2]/li[{}]/a[2]".format(
                                                           p + 1)).get_attribute('href')
-                driver.implicitly_wait(10)
-                match = re.findall(r'BV\w+', url_publisher_video)
-                if BV == ''.join(match):
-                    continue
-                else:
-                    publisher_bvid.append(''.join(match))
+            driver.implicitly_wait(10)
+            match = re.findall(r'BV\w+', url_publisher_video)
+            if BV == ''.join(match):
+                continue
             else:
-                for p in range(1, page+1):
-                    driver.get('https://space.bilibili.com/{}/video?tid=0&pn={}&keyword=&order=pubdate'.format(mid,p))
-                    driver.implicitly_wait(10)
-                    for v in range(0, 30):
-                        time.sleep(0.1)
-                        url_publisher_video = driver.find_element(By.XPATH,
+                publisher_bvid.append(''.join(match))
+    else:
+            for p in range(1, page+1):
+                driver.get('https://space.bilibili.com/{}/video?tid=0&pn={}&keyword=&order=pubdate'.format(mid,p))
+                driver.implicitly_wait(10)
+                for v in range(0, 30):
+                    time.sleep(0.1)
+                    url_publisher_video = driver.find_element(By.XPATH,
                                                           "/html/body/div[2]/div[4]/div/div/div[2]/div[4]/div/div/ul[2]/li[{}]/a[2]".format(
                                                               v + 1)).get_attribute('href')
-                        match = re.findall(r'BV\w+', url_publisher_video)
-                        if BV == ''.join(match):
-                            continue
-                        else:
-                            publisher_bvid.append(''.join(match))
+                    match = re.findall(r'BV\w+', url_publisher_video)
+                    if BV == ''.join(match):
+                        continue
+                    else:
+                        publisher_bvid.append(''.join(match))
     return publisher_bvid
+
 
     
     
