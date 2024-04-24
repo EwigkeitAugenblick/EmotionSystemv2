@@ -573,8 +573,8 @@ def main():
             if url:
                 st.write(f'<p style="font-size:25px;font-weight:bold;">此视频相关视频列表:</p >',
                          unsafe_allow_html=True)
-                project_path = os.getcwd()
-                file = project_path+'\相关视频\第' + number + '条链接相关视频.csv'
+               
+                file = './相关视频/第' + number + '条链接相关视频.csv'
                 related_video = pd.read_csv(file, encoding='utf-8')
                 video = related_video[['标题', '标签', '简介']]
                 with st.expander("同作者路径搜索视频:", True):
