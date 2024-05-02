@@ -283,7 +283,7 @@ def publisher_bv(BV,params):
     #opt.add_argument('--disable-gpu') 
 
     #driver = Chrome(options=opt)
-    driver = Chrome(path='./chromedriver.exe')
+    driver = Chrome(executable_path='./chromedriver.exe')
     
     driver.get('https://space.bilibili.com/' + str(mid) + '/video')
     time.sleep(30)
