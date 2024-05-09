@@ -286,8 +286,8 @@ def publisher_bv(BV,params):
 
     
     driver.get('https://space.bilibili.com/' + str(mid) + '/video')
-    time.sleep(30)
-    number= int(driver.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/div/div[2]/div[2]/a[1]/span").text)
+    #time.sleep(30)
+    number= int(driver.find_element(By.XPATH, "//span[@class='count']").text)
     page = number // 30
     if page==0:
         for p in range(0,number):
