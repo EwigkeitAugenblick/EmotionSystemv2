@@ -278,13 +278,13 @@ def publisher_bv(BV,params):
     video = videos['data']
     mid = video['owner']['mid']
     
-    #opt = Options()
-    #opt.add_argument('--headless')  # 设置为无头
-    #opt.add_argument('--disable-gpu') 
+    opt = Options()
+    opt.add_argument('--headless')  # 设置为无头
+    opt.add_argument('--disable-gpu') 
 
-    #driver = Chrome(options=opt)
+    driver = Chrome(options=opt)
 
-    driver = webdriver.Chrome(executable_path='./chromedriver.exe')
+    #driver = webdriver.Chrome(executable_path='./chromedriver.exe')
     
     driver.get('https://space.bilibili.com/' + str(mid) + '/video')
     time.sleep(30)
