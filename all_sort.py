@@ -284,7 +284,6 @@ def publisher_bv(BV,params):
 
     driver = Chrome(options=opt)
 
-    #driver = webdriver.Chrome(executable_path='./chromedriver.exe')
     
     driver.get('https://space.bilibili.com/' + str(mid) + '/video')
     time.sleep(30)
